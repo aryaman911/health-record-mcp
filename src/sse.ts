@@ -285,6 +285,33 @@ async function main() {
             }
         });
 
+        // --- API: Get record data by database ID (for chat UI) ---
+        app.get('/api/record-data/:databaseId', async (req, res) => {
+            const { databaseId } = req.params;
+            if (!config.persistence?.enabled || !config.persistence?.directory) {
+                res.status(404).json({ error: "Persistence not enabled" });
+                return;
+            }
+            // Sanitize databaseId to prevent path traversal
+            if (databaseId.includes('/') || databaseId.includes('\\') || databaseId.includes('..')) {
+                res.status(400).json({ error: "Invalid database ID" });
+                return;
+            }
+            const filePath = path.join(config.persistence.directory, `${databaseId}.sqlite`);
+            let db: Database | undefined;
+            try {
+                await fs.access(filePath);
+                db = new Database(filePath);
+                const ehrData = await sqliteToEhr(db);
+                db.close();
+                res.json(ehrData);
+            } catch (error: any) {
+                if (db) try { db.close(); } catch(e) {}
+                console.error(`[/api/record-data] Error loading record ${databaseId}:`, error);
+                res.status(404).json({ error: "Record not found", message: error.message });
+            }
+        });
+
         // --- MCP SSE Endpoint ---
         app.get("/mcp-sse", sseBearerAuthMiddleware, async (req: Request, res: Response) => {
             const authInfo = req.auth; // Provided by bearerAuthMiddleware
