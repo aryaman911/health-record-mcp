@@ -1,0 +1,35 @@
+{
+  "retrieverConfig": {
+    "deliveryEndpoints": {
+      "mcp-callback": {
+        "postUrl": "/ehr-retriever-callback"
+      }
+    },
+    "brandFiles": [
+      {
+        "url": "./brands/epic-sandbox.json",
+        "tags": ["epic", "prod"],
+        "vendorConfig": {
+          "clientId": "6a424079-77de-418b-94c7-485d08ffc3f7",
+          "scopes": "patient/*.rs",
+          "note": "Username 'fhircamila', Password 'epicepic1'"
+        }
+      }
+    ]
+  },
+  "server": {
+    "host": "0.0.0.0",
+    "port": 10000,
+    "ehrCallbackPath": "/ehr-callback",
+    "https": {
+      "enabled": false
+    }
+  },
+  "persistence": {
+    "enabled": true,
+    "directory": "./data"
+  },
+  "security": {
+    "disableClientChecks": true
+  }
+}

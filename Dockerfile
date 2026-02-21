@@ -4,19 +4,25 @@ FROM oven/bun:latest
 # Set the working directory
 WORKDIR /app
 
-# Copy package.json and bun.lock
+# Copy package.json and bun.lock first (for layer caching)
 COPY package.json bun.lock ./
 
-# Install dependencies (use --production if you don't need devDependencies)
-# Using --frozen-lockfile is recommended for reproducible builds
+# Install dependencies
 RUN bun install --frozen-lockfile
 
-# Copy the application code
-COPY index.ts .
+# Copy all application source code
+COPY src/ ./src/
+COPY static/ ./static/
+COPY scripts/ ./scripts/
+COPY clientTypes.ts clientFhirUtils.ts ehretriever.ts ./
+COPY config.*.json sample-config.json ./
+COPY opener.html ./
 
-# Expose the port the server will run on (default 3001 or MCP_SERVER_PORT)
-# Note: This doesn't actually map the port, just documents it. Use -p in `docker run`.
-EXPOSE 3001
+# Create data directory for persistence
+RUN mkdir -p ./data
 
-# Define the entry point
-ENTRYPOINT [ "bun", "run", "index.ts" ]
+# Render uses port 10000 by default
+EXPOSE 10000
+
+# Run the SSE server with Render config
+CMD [ "bun", "run", "src/sse.ts", "--config", "./config.render.json" ]
