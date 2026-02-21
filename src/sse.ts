@@ -31,7 +31,7 @@ import { AuthInfo } from "@modelcontextprotocol/sdk/server/auth/types.js";
 import { ehrToSqlite, sqliteToEhr } from './dbUtils.js'; // Import functions from dbUtils
 import type { AuthzRequestState } from './oauth';
 import { OAuthClientInformationFull } from "@modelcontextprotocol/sdk/shared/auth.js";
-import { addStreamableHttpTransport } from './streamable-http.ts';
+//import { addStreamableHttpTransport } from './streamable-http.ts';
 
 // --- Add Type Declaration for req.auth ---
 declare module "express-serve-static-core" {
@@ -172,7 +172,7 @@ async function main() {
         const oauthProvider = addOauthRoutesAndProvider(app, config, activeSessions);
         console.log("[INIT] OAuth routes and provider initialized.");
         
-        addStreamableHttpTransport(app, mcpServer, oauthProvider);
+        //addStreamableHttpTransport(app, mcpServer, oauthProvider);
         console.log("[INIT] Streamable HTTP transport initialized.");
 
         // --- Custom Bearer Auth Middleware for SSE ---
